@@ -74,6 +74,7 @@ namespace BLL.Service.Realizations
             }
 
             _unitOfWork.Book.Delete(book);
+            await _unitOfWork.SaveAsync();
         }
 
         public async Task<IEnumerable<BookBriefInformation>> Search(string searchRequest, string userId)
