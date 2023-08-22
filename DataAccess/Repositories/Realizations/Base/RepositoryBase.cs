@@ -14,9 +14,9 @@ namespace DataAccess.Repositories.Realizations.Base
     {
         protected ApplicationDbContext _context { get; set; }
 
-        protected RepositoryBase(ApplicationDbContext ePlastDBContext)
+        protected RepositoryBase(ApplicationDbContext context)
         {
-            this._context = ePlastDBContext;
+            this._context = context;
         }
 
         public IQueryable<T> FindAll()
@@ -120,14 +120,17 @@ namespace DataAccess.Repositories.Realizations.Base
             {
                 query = include(query);
             }
+
             if (predicate != null)
             {
                 query = query.Where(predicate);
             }
+
             if (selector != null)
             {
                 query = query.Select(selector);
             }
+
             return query;
         }
 

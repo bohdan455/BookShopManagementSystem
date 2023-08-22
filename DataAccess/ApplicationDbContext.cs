@@ -21,6 +21,8 @@ namespace DataAccess
 
         public DbSet<Publisher> Publishers { get; set; }
 
+        public DbSet<ReservedBook> ReservedBooks { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

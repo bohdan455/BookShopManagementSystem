@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repositories.Realizations.Base
 {
-    public class UnitOfWork
+    public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _context;
         private IAuthorRepository? _authorRepository;
@@ -20,7 +20,7 @@ namespace DataAccess.Repositories.Realizations.Base
         private IPublisherRepository? _publisherRepository;
 
         public IAuthorRepository Author
-        { 
+        {
             get
             {
                 _authorRepository ??= new AuthorRepository(_context);
