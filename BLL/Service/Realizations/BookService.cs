@@ -1,4 +1,5 @@
 ﻿using BLL.Dto;
+using BLL.Service.Interfaces;
 using DataAccess.Entities;
 using DataAccess.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -15,17 +16,19 @@ namespace BLL.Service.Realizations
     public class BookService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IBookPromotionService _bookPromotionService;
 
-        public BookService(IUnitOfWork unitOfWork)
+        public BookService(IUnitOfWork unitOfWork,IBookPromotionService bookPromotionService)
         {
             _unitOfWork = unitOfWork;
+            _bookPromotionService = bookPromotionService;
         }
 
         public async Task Add(BookDto bookDto)
         {
             var book = new Book
             {
-                DateOfAdding = DateTime.Now,
+                DateOfAdding = DateTime.UtcNow,
                 NumberOfPages = bookDto.NumberOfPages,
                 PreviousBookId = bookDto.PreviousBookId,
                 Year = bookDto.Year,
@@ -100,7 +103,8 @@ namespace BLL.Service.Realizations
                 br => br.Include(b => b.Author)
                 .Include(b => b.Genre)
                 .Include(b => b.Publisher)
-                .Include(b => b.PreviousBook));
+                .Include(b => b.PreviousBook)
+                .Include(b => b.Discount));
 
             if (bookFromDb == null)
             {
@@ -117,6 +121,7 @@ namespace BLL.Service.Realizations
                 Quantity = bookFromDb.Quantity,
                 ProductionPrice = bookFromDb.ProductionPrice,
                 SellingPrice = bookFromDb.SellingPrice,
+                PriceWithDiscount = await _bookPromotionService.CalculateDiscountOfBook(bookFromDb),
                 Title = bookFromDb.Title,
                 Year = bookFromDb.Year,
             };

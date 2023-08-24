@@ -54,17 +54,17 @@ namespace DataAccess.Repositories.Realizations.Base
             this._context.Set<T>().Attach(entity);
         }
 
-        public async Task<IEnumerable<T?>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null)
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null)
         {
             return await this.GetQuery(predicate, include).ToListAsync();
         }
 
-        public async Task<IEnumerable<T?>> GetAllAsync(Expression<Func<T, T>> selector, Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null)
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, T>> selector, Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null)
         {
             return await this.GetQuery(predicate, include, selector).ToListAsync();
         }
 
-        public async Task<T?> GetFirstAsync(Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null)
+        public async Task<T> GetFirstAsync(Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null)
         {
             var query = this.GetQuery(predicate, include);
             return await query.FirstAsync();
@@ -80,7 +80,7 @@ namespace DataAccess.Repositories.Realizations.Base
             return await this.GetQuery(predicate, include, selector).FirstOrDefaultAsync();
         }
 
-        public async Task<T?> GetLastAsync(Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null)
+        public async Task<T> GetLastAsync(Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null)
         {
             return await this.GetQuery(predicate, include).LastAsync();
         }
@@ -90,7 +90,7 @@ namespace DataAccess.Repositories.Realizations.Base
             return await this.GetQuery(predicate, include).LastOrDefaultAsync();
         }
 
-        public async Task<T?> GetSingleAsync(Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null)
+        public async Task<T> GetSingleAsync(Expression<Func<T, bool>>? predicate = null, Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null)
         {
             return await this.GetQuery(predicate, include).SingleAsync();
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,6 +26,8 @@ namespace BLL.Dto
         public decimal ProductionPrice { get; set; }
 
         public decimal SellingPrice { get; set; }
+
+        public decimal PriceWithDiscount { get; set; }
 
         public BookBriefInformation? PreviousBook { get; set; }
 
