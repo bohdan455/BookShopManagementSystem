@@ -1,4 +1,4 @@
-﻿using BLL.Dto;
+﻿using BLL.Dto.Promotion;
 using BLL.Service.Interfaces;
 using DataAccess.Entities;
 using DataAccess.Repositories.Interfaces;
@@ -27,6 +27,7 @@ namespace BLL.Service.Realizations
                 ExpirationTime = promotionDto.ExpirationTime,
                 AmountInPercent = promotionDto.AmountInPercent,
                 Name = promotionDto.Name,
+                UserId = promotionDto.UserId,
             };
 
             await _unitOfWork.Discount.CreateAsync(discount);
@@ -35,9 +36,9 @@ namespace BLL.Service.Realizations
                 u.SetProperty(b => b.DiscountId,discount.Id));
         }
 
-        public async Task Delete(int id)
+        public async Task Delete(int id,string userId)
         {
-            await _unitOfWork.Discount.FindByCondition(d => d.Id == id).ExecuteDeleteAsync();
+            await _unitOfWork.Discount.FindByCondition(d => d.Id == id && d.UserId == userId).ExecuteDeleteAsync();
         }
 
         public async Task<decimal> CalculateDiscountOfBook(Book book)
@@ -56,9 +57,23 @@ namespace BLL.Service.Realizations
             return CalculateDiscount(book.SellingPrice, book.Discount.AmountInPercent);
         }
 
+        public async Task<IEnumerable<PromotionBriefInformation>> GetAll(string userId)
+        {
+            var result = await _unitOfWork.Discount.GetAllAsync(d => d.UserId == userId);
+
+            return result.Select(d => new PromotionBriefInformation
+            {
+                Id = d.Id,
+                Name = d.Name,
+                Percent = d.AmountInPercent,
+            });
+        }
+
         private decimal CalculateDiscount(decimal price, decimal discount)
         {
             return price * (100 - discount) / 100;
         }
+
+
     }
 }

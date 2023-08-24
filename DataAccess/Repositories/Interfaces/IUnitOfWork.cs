@@ -11,6 +11,8 @@ namespace DataAccess.Repositories.Interfaces
         IOrderDetailsRepository OrderDetails { get; }
         IOrderPartRepository OrderPart { get; }
         IPublisherRepository Publisher { get; }
+        IReservationRepository Reservation { get; }
+        IReservationPartRepository ReservationPartPart { get; }
 
         void Save();
         Task SaveAsync();

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BLL.Dto
+namespace BLL.Dto.Promotion
 {
     public class PromotionDto
     {
@@ -16,5 +16,7 @@ namespace BLL.Dto
         public decimal AmountInPercent { get; set; }
 
         public DateTime ExpirationTime { get; set; }
+
+        public string UserId { get; set; } = default!;
     }
 }

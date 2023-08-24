@@ -21,7 +21,9 @@ namespace DataAccess
 
         public DbSet<Publisher> Publishers { get; set; }
 
-        public DbSet<ReservedBook> ReservedBooks { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
+
+        public DbSet<ReservationPart> ReservationParts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -51,11 +53,16 @@ namespace DataAccess
             builder.Entity<Book>()
                 .HasOne(b => b.Discount)
                 .WithMany(d => d.Books)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.NoAction);
 
             builder.Entity<OrderPart>()
                 .HasOne(op => op.Order)
                 .WithMany(od => od.OrderParts)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ReservationPart>()
+                .HasOne(rp => rp.Reservation)
+                .WithMany(r => r.ReservationParts)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 

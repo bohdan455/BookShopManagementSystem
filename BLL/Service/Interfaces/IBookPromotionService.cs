@@ -1,4 +1,4 @@
-﻿using BLL.Dto;
+﻿using BLL.Dto.Promotion;
 using DataAccess.Entities;
 
 namespace BLL.Service.Interfaces
@@ -7,6 +7,7 @@ namespace BLL.Service.Interfaces
     {
         Task<decimal> CalculateDiscountOfBook(Book book);
         Task Create(PromotionDto promotionDto);
-        Task Delete(int id);
+        Task Delete(int id, string userId);
+        Task<IEnumerable<PromotionBriefInformation>> GetAll(string userId);
     }
 }

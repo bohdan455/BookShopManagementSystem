@@ -1,4 +1,4 @@
-﻿using BLL.Dto;
+﻿using BLL.Dto.Book;
 using BLL.Service.Interfaces;
 using DataAccess.Entities;
 using DataAccess.Repositories.Interfaces;

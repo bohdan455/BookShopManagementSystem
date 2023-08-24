@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BLL.Dto
+namespace BLL.Dto.Book
 {
-    public class BookFullInformation
+    public class BookBriefInformation
     {
         public int Id { get; set; }
 
@@ -15,22 +14,10 @@ namespace BLL.Dto
 
         public string Author { get; set; } = default!;
 
-        public string Publisher { get; set; } = default!;
-
-        public int NumberOfPages { get; set; }
-
         public string Genre { get; set; } = default!;
 
         public short Year { get; set; }
 
-        public decimal ProductionPrice { get; set; }
-
         public decimal SellingPrice { get; set; }
-
-        public decimal PriceWithDiscount { get; set; }
-
-        public BookBriefInformation? PreviousBook { get; set; }
-
-        public int Quantity { get; set; }
     }
 }

@@ -18,6 +18,8 @@ namespace DataAccess.Repositories.Realizations.Base
         private IOrderDetailsRepository? _orderDetailsRepository;
         private IOrderPartRepository? _orderPartRepository;
         private IPublisherRepository? _publisherRepository;
+        private IReservationRepository? _reservationRepository;
+        private IReservationPartRepository? _reservationPartRepository;
 
         public IAuthorRepository Author
         {
@@ -79,6 +81,24 @@ namespace DataAccess.Repositories.Realizations.Base
             {
                 _publisherRepository ??= new PublisherRepository(_context);
                 return _publisherRepository;
+            }
+        }
+
+        public IReservationRepository Reservation
+        {
+            get
+            {
+                _reservationRepository ??= new ReservationRepository(_context);
+                return _reservationRepository;
+            }
+        }
+
+        public IReservationPartRepository ReservationPartPart
+        {
+            get
+            {
+                _reservationPartRepository ??= new ReservationPartRepository(_context);
+                return _reservationPartRepository;
             }
         }
 
