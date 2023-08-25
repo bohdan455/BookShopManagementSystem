@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace BLL.Dto.Reservation
 {
-    public class ReservationDto
+    public class ReservationFullInformation
     {
-        public string FullNameOfReservator { get; set; } = default!;
+        public int Id { get; set; }
+
+        public string FullNameOfReservator { get; set; } = string.Empty;
 
         public DateTime ExpirationTime { get; set; }
 
-        public string UserId { get; set; } = default!;
-
         public List<ReservationPartDto> ReservationParts { get; set; } = default!;
+
     }
 }

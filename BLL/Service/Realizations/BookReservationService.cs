@@ -1,5 +1,8 @@
 ﻿using BLL.Dto.Reservation;
+using BLL.Service.Interfaces;
+using DataAccess.Entities;
 using DataAccess.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,30 +14,92 @@ namespace BLL.Service.Realizations
     public class BookReservationService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IBookService _bookService;
 
-        public BookReservationService(IUnitOfWork unitOfWork)
+        public BookReservationService(IUnitOfWork unitOfWork,IBookService bookService)
         {
             _unitOfWork = unitOfWork;
+            _bookService = bookService;
         }
 
-        public Task Reserve(ReservationDto reservationDto)
+        public async Task<bool> Reserve(ReservationDto reservationDto)
+        {
+            var reservation = new Reservation
+            {
+                ExpirationTime = reservationDto.ExpirationTime,
+                FullNameOfReservator = reservationDto.FullNameOfReservator,
+                UserId = reservationDto.UserId,
+                ReservationParts = reservationDto.ReservationParts.Select(rp => new ReservationPart
+                {
+                    BookId = rp.BookId,
+                    Quantity = rp.Quantity,
+                }).ToList(),
+            };
+
+            foreach (var reservationPart in reservation.ReservationParts)
+            {
+                if(!await _bookService.DecreaseQuantity(reservationPart.BookId, reservationPart.Quantity))
+                {
+                    return false;
+                }
+            }
+
+            await _unitOfWork.Reservation.CreateAsync(reservation);
+            await _unitOfWork.SaveAsync();
+            return true;
+        }
+
+        public async Task Cancel(int id, string userId)
+        {
+            var reservation = await _unitOfWork.Reservation.GetFirstOrDefaultAsync(r => r.Id == id && r.UserId == userId,rr => rr.Include(r => r.ReservationParts));
+            if (reservation == null)
+            {
+                return;
+            }
+
+            foreach (var reservationPart in reservation.ReservationParts)
+            {
+                await _bookService.IncreaseQuantity(reservationPart.BookId,reservationPart.Quantity);
+            }
+
+            _unitOfWork.Reservation.Delete(reservation);
+            await _unitOfWork.SaveAsync();
+        }
+
+        public Task Confirm(int id, string userId)
         {
             throw new NotImplementedException();
         }
 
-        public Task CancelReservation(int id, string userId)
+        public async Task<IEnumerable<ReservationBriefInformation>> GetAll(string userId)
         {
-            throw new NotImplementedException();
+            var result = await _unitOfWork.Reservation.GetAllAsync(r => r.UserId == userId);
+            return result.Select(r => new ReservationBriefInformation
+            {
+                Id = r.Id,
+                FullNameOfReservator = r.FullNameOfReservator,
+            });
         }
 
-        public Task ConfirmReservation(int id, string userId)
+        public async Task<ReservationFullInformation?> GetFullInformation(int id, string userId)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task GetAllReservations(string userId)
-        {
-            throw new NotImplementedException();
-        }
+            var result = await _unitOfWork.Reservation.GetFirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
+            if (result == null)
+            {
+                return null;
+            }
+            return new ReservationFullInformation
+            {
+                ExpirationTime = result.ExpirationTime,
+                FullNameOfReservator = result.FullNameOfReservator,
+                Id = result.Id,
+                ReservationParts = result.ReservationParts.Select(r => new ReservationPartDto
+                {
+                    BookId = r.BookId,
+                    PriceForItem = r.PriceForItem,
+                    Quantity = r.Quantity,
+                }).ToList(),
+            };
     }
+}
 }

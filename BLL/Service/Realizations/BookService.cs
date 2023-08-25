@@ -13,12 +13,12 @@ using System.Threading.Tasks;
 
 namespace BLL.Service.Realizations
 {
-    public class BookService
+    public class BookService : IBookService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IBookPromotionService _bookPromotionService;
 
-        public BookService(IUnitOfWork unitOfWork,IBookPromotionService bookPromotionService)
+        public BookService(IUnitOfWork unitOfWork, IBookPromotionService bookPromotionService)
         {
             _unitOfWork = unitOfWork;
             _bookPromotionService = bookPromotionService;
@@ -68,7 +68,7 @@ namespace BLL.Service.Realizations
             await _unitOfWork.SaveAsync();
         }
 
-        public async Task Delete(int id,string userId)
+        public async Task Delete(int id, string userId)
         {
             var book = await _unitOfWork.Book.GetFirstOrDefaultAsync(b => b.Id == id && b.UserId == userId);
             if (book == null)
@@ -97,9 +97,9 @@ namespace BLL.Service.Realizations
             });
         }
 
-        public async Task<BookFullInformation?> GetFullInformation(int id,string userId)
+        public async Task<BookFullInformation?> GetFullInformation(int id, string userId)
         {
-            var bookFromDb = await _unitOfWork.Book.GetFirstOrDefaultAsync(predicate: b => b.Id == id && b.UserId == userId, 
+            var bookFromDb = await _unitOfWork.Book.GetFirstOrDefaultAsync(predicate: b => b.Id == id && b.UserId == userId,
                 br => br.Include(b => b.Author)
                 .Include(b => b.Genre)
                 .Include(b => b.Publisher)
@@ -176,6 +176,27 @@ namespace BLL.Service.Realizations
             }
 
             return genre.Id;
+        }
+
+        public async Task<bool> DecreaseQuantity(int bookId, int quantity)
+        {
+            var book = await _unitOfWork.Book.GetFirstAsync(b => b.Id == bookId);
+            if (book.Quantity < quantity)
+            {
+                return false;
+            }
+            else
+            {
+                book.Quantity -= quantity;
+                _unitOfWork.Book.Update(book);
+                await _unitOfWork.SaveAsync();
+                return true;
+            }
+        }
+
+        public async Task IncreaseQuantity(int bookId, int quantity)
+        {
+            await _unitOfWork.Book.FindByCondition(b => b.Id == bookId).ExecuteUpdateAsync(u => u.SetProperty(b => b.Quantity, b => b.Quantity + quantity));
         }
 
         private async Task<int> GetOrCreatePublisher(string publisherName)
