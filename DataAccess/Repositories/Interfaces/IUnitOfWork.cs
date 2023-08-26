@@ -12,7 +12,7 @@ namespace DataAccess.Repositories.Interfaces
         IOrderPartRepository OrderPart { get; }
         IPublisherRepository Publisher { get; }
         IReservationRepository Reservation { get; }
-        IReservationPartRepository ReservationPartPart { get; }
+        IReservationPartRepository ReservationPart { get; }
 
         void Save();
         Task SaveAsync();

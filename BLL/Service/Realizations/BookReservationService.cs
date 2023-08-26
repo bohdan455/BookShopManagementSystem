@@ -15,11 +15,13 @@ namespace BLL.Service.Realizations
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IBookService _bookService;
+        private readonly IBookSellingService _bookSellingService;
 
-        public BookReservationService(IUnitOfWork unitOfWork,IBookService bookService)
+        public BookReservationService(IUnitOfWork unitOfWork,IBookService bookService,IBookSellingService bookSellingService)
         {
             _unitOfWork = unitOfWork;
             _bookService = bookService;
+            _bookSellingService = bookSellingService;
         }
 
         public async Task<bool> Reserve(ReservationDto reservationDto)
@@ -66,9 +68,23 @@ namespace BLL.Service.Realizations
             await _unitOfWork.SaveAsync();
         }
 
-        public Task Confirm(int id, string userId)
+        public async Task Confirm(int id, string userId)
         {
-            throw new NotImplementedException();
+            var reservation = await _unitOfWork.Reservation
+                .GetFirstOrDefaultAsync(r => r.Id == id && r.UserId == userId, rr => rr.Include(r => r.ReservationParts));
+
+            await _bookSellingService.CreateOrder(new Dto.Order.OrderDto
+            {
+                UserId = reservation.UserId,
+                OrderParts = reservation.ReservationParts.Select(rp => new Dto.Order.OrderPartDto
+                {
+                    BookId = rp.BookId,
+                    PriceForItem = rp.PriceForItem,
+                    Quantity = rp.Quantity,
+                }).ToList(),
+            });
+            _unitOfWork.Reservation.Delete(reservation);
+            await _unitOfWork.SaveAsync();
         }
 
         public async Task<IEnumerable<ReservationBriefInformation>> GetAll(string userId)

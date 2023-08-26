@@ -93,7 +93,7 @@ namespace DataAccess.Repositories.Realizations.Base
             }
         }
 
-        public IReservationPartRepository ReservationPartPart
+        public IReservationPartRepository ReservationPart
         {
             get
             {
