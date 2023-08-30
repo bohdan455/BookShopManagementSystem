@@ -1,5 +1,6 @@
 ﻿using DataAccess.Repositories.Interfaces;
 using DataAccess.Repositories.Realizations.Main;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace DataAccess.Repositories.Realizations.Base
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _context;
+        private IDbContextTransaction _objTran;
         private IAuthorRepository? _authorRepository;
         private IBookRepository? _bookRepository;
         private IDiscountRepository? _discountRepository;
@@ -115,6 +117,22 @@ namespace DataAccess.Repositories.Realizations.Base
         public async Task SaveAsync()
         {
             await _context.SaveChangesAsync();
+        }
+
+        public void CreateTransaction()
+        {
+            _objTran = _context.Database.BeginTransaction();
+        }
+
+        public void Commit()
+        {
+            _objTran.Commit();
+        }
+
+        public void Rollback()
+        {
+            _objTran.Rollback();
+            _objTran.Dispose();
         }
     }
 }

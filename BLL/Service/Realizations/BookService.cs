@@ -37,9 +37,9 @@ namespace BLL.Service.Realizations
                 SellingPrice = bookDto.SellingPrice,
                 ProductionPrice = bookDto.ProductionPrice,
                 Title = bookDto.Title,
-                GenreId = await GetOrCreateGenre(bookDto.Genre),
-                PublisherId = await GetOrCreatePublisher(bookDto.Publisher),
-                AuthorId = await GetOrCreateAuthor(bookDto.Author),
+                GenreId = await GetOrCreateGenre(bookDto.Genre,bookDto.UserId),
+                PublisherId = await GetOrCreatePublisher(bookDto.Publisher, bookDto.UserId),
+                AuthorId = await GetOrCreateAuthor(bookDto.Author, bookDto.UserId),
             };
 
             await _unitOfWork.Book.CreateAsync(book);
@@ -59,9 +59,9 @@ namespace BLL.Service.Realizations
                 SellingPrice = bookDto.SellingPrice,
                 ProductionPrice = bookDto.ProductionPrice,
                 Title = bookDto.Title,
-                GenreId = await GetOrCreateGenre(bookDto.Genre),
-                PublisherId = await GetOrCreatePublisher(bookDto.Publisher),
-                AuthorId = await GetOrCreateAuthor(bookDto.Author),
+                GenreId = await GetOrCreateGenre(bookDto.Genre, bookDto.UserId),
+                PublisherId = await GetOrCreatePublisher(bookDto.Publisher, bookDto.UserId),
+                AuthorId = await GetOrCreateAuthor(bookDto.Author, bookDto.UserId),
             };
 
             _unitOfWork.Book.Update(book);
@@ -80,7 +80,7 @@ namespace BLL.Service.Realizations
             await _unitOfWork.SaveAsync();
         }
 
-        public async Task<IEnumerable<BookBriefInformation>> Search(string searchRequest, string userId)
+        public async Task<IEnumerable<BookBriefInformation>> Search(string userId, string searchRequest = "")
         {
             var result = await _unitOfWork.Book.GetAllAsync(
                 b => (b.Title.Contains(searchRequest) || b.Author.Name.Contains(searchRequest) || b.Genre.Name.Contains(searchRequest)) && b.UserId == userId,
@@ -93,7 +93,8 @@ namespace BLL.Service.Realizations
                 Title = b.Title,
                 Id = b.Id,
                 SellingPrice = b.SellingPrice,
-                Year = b.Year
+                Year = b.Year,
+                Quantity = b.Quantity,
             });
         }
 
@@ -103,8 +104,8 @@ namespace BLL.Service.Realizations
                 br => br.Include(b => b.Author)
                 .Include(b => b.Genre)
                 .Include(b => b.Publisher)
-                .Include(b => b.PreviousBook)
-                .Include(b => b.Discount));
+                .Include(b => b.PreviousBook!)
+                .Include(b => b.Discount!));
 
             if (bookFromDb == null)
             {
@@ -138,44 +139,12 @@ namespace BLL.Service.Realizations
                     Genre = bookFromDb.PreviousBook.Genre.Name,
                     SellingPrice = bookFromDb.PreviousBook.SellingPrice,
                     Year = bookFromDb.PreviousBook.Year,
+                    Id = bookFromDb.PreviousBook.Id,
+                    Quantity = bookFromDb.PreviousBook.Quantity,
                 };
             }
 
             return resultBook;
-        }
-
-        private async Task<int> GetOrCreateAuthor(string authorName)
-        {
-            var author = await _unitOfWork.Author.GetFirstOrDefaultAsync(x => x.Name == authorName);
-            if (author == null)
-            {
-                author = new Author
-                {
-                    Name = authorName,
-                };
-
-                await _unitOfWork.Author.CreateAsync(author);
-                await _unitOfWork.SaveAsync();
-            }
-
-            return author.Id;
-        }
-
-        private async Task<int> GetOrCreateGenre(string genreName)
-        {
-            var genre = await _unitOfWork.Genre.GetFirstOrDefaultAsync(x => x.Name == genreName);
-            if (genre == null)
-            {
-                genre = new Genre
-                {
-                    Name = genreName,
-                };
-
-                await _unitOfWork.Genre.CreateAsync(genre);
-                await _unitOfWork.SaveAsync();
-            }
-
-            return genre.Id;
         }
 
         public async Task<bool> DecreaseQuantity(int bookId, int quantity)
@@ -199,7 +168,43 @@ namespace BLL.Service.Realizations
             await _unitOfWork.Book.FindByCondition(b => b.Id == bookId).ExecuteUpdateAsync(u => u.SetProperty(b => b.Quantity, b => b.Quantity + quantity));
         }
 
-        private async Task<int> GetOrCreatePublisher(string publisherName)
+        private async Task<int> GetOrCreateAuthor(string authorName,string userId)
+        {
+            var author = await _unitOfWork.Author.GetFirstOrDefaultAsync(x => x.Name == authorName);
+            if (author == null)
+            {
+                author = new Author
+                {
+                    Name = authorName,
+                    UserId = userId,
+                };
+
+                await _unitOfWork.Author.CreateAsync(author);
+                await _unitOfWork.SaveAsync();
+            }
+
+            return author.Id;
+        }
+
+        private async Task<int> GetOrCreateGenre(string genreName, string userId)
+        {
+            var genre = await _unitOfWork.Genre.GetFirstOrDefaultAsync(x => x.Name == genreName);
+            if (genre == null)
+            {
+                genre = new Genre
+                {
+                    Name = genreName,
+                    UserId = userId,
+                };
+
+                await _unitOfWork.Genre.CreateAsync(genre);
+                await _unitOfWork.SaveAsync();
+            }
+
+            return genre.Id;
+        }
+
+        private async Task<int> GetOrCreatePublisher(string publisherName, string userId)
         {
             var publisher = await _unitOfWork.Publisher.GetFirstOrDefaultAsync(x => x.Name == publisherName);
             if (publisher == null)
@@ -207,6 +212,7 @@ namespace BLL.Service.Realizations
                 publisher = new Publisher
                 {
                     Name = publisherName,
+                    UserId = userId,
                 };
 
                 await _unitOfWork.Publisher.CreateAsync(publisher);

@@ -53,7 +53,8 @@ namespace DataAccess
             builder.Entity<Book>()
                 .HasOne(b => b.Discount)
                 .WithMany(d => d.Books)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.NoAction)
+                .IsRequired(false);
 
             builder.Entity<OrderPart>()
                 .HasOne(op => op.Order)

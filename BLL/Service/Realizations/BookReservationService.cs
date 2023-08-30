@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 
 namespace BLL.Service.Realizations
 {
-    public class BookReservationService
+    public class BookReservationService : IBookReservationService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IBookService _bookService;
         private readonly IBookSellingService _bookSellingService;
 
-        public BookReservationService(IUnitOfWork unitOfWork,IBookService bookService,IBookSellingService bookSellingService)
+        public BookReservationService(IUnitOfWork unitOfWork, IBookService bookService, IBookSellingService bookSellingService)
         {
             _unitOfWork = unitOfWork;
             _bookService = bookService;
@@ -40,7 +40,7 @@ namespace BLL.Service.Realizations
 
             foreach (var reservationPart in reservation.ReservationParts)
             {
-                if(!await _bookService.DecreaseQuantity(reservationPart.BookId, reservationPart.Quantity))
+                if (!await _bookService.DecreaseQuantity(reservationPart.BookId, reservationPart.Quantity))
                 {
                     return false;
                 }
@@ -53,7 +53,7 @@ namespace BLL.Service.Realizations
 
         public async Task Cancel(int id, string userId)
         {
-            var reservation = await _unitOfWork.Reservation.GetFirstOrDefaultAsync(r => r.Id == id && r.UserId == userId,rr => rr.Include(r => r.ReservationParts));
+            var reservation = await _unitOfWork.Reservation.GetFirstOrDefaultAsync(r => r.Id == id && r.UserId == userId, rr => rr.Include(r => r.ReservationParts));
             if (reservation == null)
             {
                 return;
@@ -61,7 +61,7 @@ namespace BLL.Service.Realizations
 
             foreach (var reservationPart in reservation.ReservationParts)
             {
-                await _bookService.IncreaseQuantity(reservationPart.BookId,reservationPart.Quantity);
+                await _bookService.IncreaseQuantity(reservationPart.BookId, reservationPart.Quantity);
             }
 
             _unitOfWork.Reservation.Delete(reservation);
@@ -79,7 +79,6 @@ namespace BLL.Service.Realizations
                 OrderParts = reservation.ReservationParts.Select(rp => new Dto.Order.OrderPartDto
                 {
                     BookId = rp.BookId,
-                    PriceForItem = rp.PriceForItem,
                     Quantity = rp.Quantity,
                 }).ToList(),
             });
@@ -112,10 +111,9 @@ namespace BLL.Service.Realizations
                 ReservationParts = result.ReservationParts.Select(r => new ReservationPartDto
                 {
                     BookId = r.BookId,
-                    PriceForItem = r.PriceForItem,
                     Quantity = r.Quantity,
                 }).ToList(),
             };
+        }
     }
-}
 }

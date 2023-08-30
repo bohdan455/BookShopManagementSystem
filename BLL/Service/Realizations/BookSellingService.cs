@@ -2,11 +2,6 @@
 using BLL.Service.Interfaces;
 using DataAccess.Entities;
 using DataAccess.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BLL.Service.Realizations
 {
@@ -25,28 +20,44 @@ namespace BLL.Service.Realizations
             var order = new OrderDetails
             {
                 DateOfPurchase = DateTime.Now,
-                TotalPrice = orderDto.OrderParts.Sum(op => op.Quantity * op.PriceForItem),
                 UserId = orderDto.UserId,
                 OrderParts = orderDto.OrderParts.Select(op => new OrderPart
                 {
                     BookId = op.BookId,
                     Quantity = op.Quantity,
-                    TotalPrice = op.PriceForItem * op.Quantity,
 
                 }).ToList(),
             };
 
+            for (int i = 0; i < order.OrderParts.Count; i++)
+            {
+                var orderPart = order.OrderParts[i];
+                var bookId = orderPart.BookId;
+                var book = await _bookService.GetFullInformation(bookId, order.UserId);
+                orderPart.TotalPrice = orderPart.Quantity * book.PriceWithDiscount;
+            }
+
+            order.TotalPrice = order.OrderParts.Sum(op => op.TotalPrice);
+            _unitOfWork.CreateTransaction();
             foreach (var orderPart in order.OrderParts)
             {
                 if (!await _bookService.DecreaseQuantity(orderPart.BookId, orderPart.Quantity))
                 {
+                    _unitOfWork.Rollback();
                     return false;
                 }
             }
-            await _unitOfWork.OrderDetails.CreateAsync(order);
-            await _unitOfWork.SaveAsync();
 
-            return true;
+            if (order.TotalPrice > 0)
+            {
+                await _unitOfWork.OrderDetails.CreateAsync(order);
+                await _unitOfWork.SaveAsync();
+                _unitOfWork.Commit();
+                return true;
+            }
+
+            _unitOfWork.Rollback();
+            return false;
         }
     }
 }

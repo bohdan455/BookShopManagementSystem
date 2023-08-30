@@ -1,4 +1,32 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿document.addEventListener("DOMContentLoaded", function () {
+    const createButton = document.getElementById("createButton");
 
-// Write your JavaScript code.
+    createButton.addEventListener("click", function () {
+        const orderData = [];
+        const cardElements = document.querySelectorAll(".card");
+        cardElements.forEach(function (card) {
+            const bookId = card.id;
+            const quantityInput = card.querySelector("input[name='quantity']");
+            const quantity = quantityInput.value;
+
+            if (quantity > 0) {
+                orderData.push({ bookId, quantity });
+            }
+        });
+
+        console.log(JSON.stringify(orderData));
+        fetch("/Order/NewOrder", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(orderData),
+        }).then(() => {
+            location.reload(); 
+        })
+            .catch(error => {
+                console.error("An error occurred:", error);
+        });
+
+    });
+});

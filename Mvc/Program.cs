@@ -1,3 +1,5 @@
+using BLL.Service.Interfaces;
+using BLL.Service.Realizations;
 using DataAccess;
 using DataAccess.Repositories.Interfaces;
 using DataAccess.Repositories.Realizations.Base;
@@ -25,6 +27,12 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.SignIn.RequireConfirmedEmail = false;
 });
 
+builder.Services.AddScoped<IBookPromotionService,BookPromotionService>();
+builder.Services.AddScoped<IBookReservationService,BookReservationService>();
+builder.Services.AddScoped<IBookSellingService,BookSellingService>();
+builder.Services.AddScoped<IBookService,BookService>();
+builder.Services.AddScoped<ISortingService, SortingService>();
+
 
 var app = builder.Build();
 
@@ -45,6 +53,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

@@ -9,7 +9,7 @@ namespace BLL.Service.Interfaces
         Task Delete(int id, string userId);
         Task<BookFullInformation?> GetFullInformation(int id, string userId);
         Task IncreaseQuantity(int bookId, int quantity);
-        Task<IEnumerable<BookBriefInformation>> Search(string searchRequest, string userId);
+        Task<IEnumerable<BookBriefInformation>> Search(string userId, string searchRequest = "");
         Task Update(BookDto bookDto);
     }
 }

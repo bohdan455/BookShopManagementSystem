@@ -1,0 +1,20 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model BookFullInformation
+<h1>@Model.Title</h1>
+<h3>Author: @Model.Author</h3>
+<h3>Publisher: @Model.Publisher</h3>
+<h3>Number of pages: @Model.NumberOfPages</h3>
+<h3>Genre: @Model.Genre</h3>
+<h3>Year: @Model.Year</h3>
+<h3>Production price: @Model.ProductionPrice</h3>
+<h3>Price without discount: @Model.SellingPrice</h3>
+<h3>Price with discount: @Model.PriceWithDiscount</h3>
+@if(Model.PreviousBook != null)
+{
+    <a asp-controller="Book" asp-action="BookFullInformation" asp-route-id="@Model.PreviousBook.Id" class="list-group-item list-group-item-action">@(Model.PreviousBook.Title)(@Model.PreviousBook.Year)(@Model.PreviousBook.Author)(@Model.PreviousBook.Genre) - @(@Model.PreviousBook.SellingPrice)$</a>
+}
+<h3>Quantity: @Model.Quantity</h3>

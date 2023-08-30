@@ -19,5 +19,7 @@ namespace BLL.Dto.Book
         public short Year { get; set; }
 
         public decimal SellingPrice { get; set; }
+
+        public int Quantity { get; set; }
     }
 }

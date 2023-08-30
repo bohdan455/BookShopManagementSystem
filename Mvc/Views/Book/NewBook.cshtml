@@ -1,0 +1,44 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model IEnumerable<BookBriefInformation>
+<h1>New Book</h1>
+<h2>@ViewData["Added Info"]</h2>
+<form method="post">
+    <div asp-validation-summary="All"></div>
+    <div class="form-group">
+        <input type="text" class="form-control" name="title" placeholder="Enter title">
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control" name="author" placeholder="Enter author">
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control" name="publisher" placeholder="Enter publisher">
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control" name="numberOfPages" placeholder="Enter number of pages">
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control" name="genre" placeholder="Enter genre">
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control" name="year" placeholder="Enter year">
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control" name="productionPrice" placeholder="Enter production price">
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control" name="sellingPrice" placeholder="Enter selling price">
+    </div>
+    <select class="form-select" aria-label="previous book of this series" name="previousBookId">
+        <option selected value="null">Previous book of this series</option>
+        @foreach (var book in Model)
+        {
+            <option value="@book.Id">@book.Title</option>
+        }
+    </select>
+    <div class="form-group">
+        <input type="text" class="form-control" name="quantity" placeholder="Enter quantity">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>

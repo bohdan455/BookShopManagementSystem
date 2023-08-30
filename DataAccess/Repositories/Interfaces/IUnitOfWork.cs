@@ -14,6 +14,9 @@ namespace DataAccess.Repositories.Interfaces
         IReservationRepository Reservation { get; }
         IReservationPartRepository ReservationPart { get; }
 
+        void Commit();
+        void CreateTransaction();
+        void Rollback();
         void Save();
         Task SaveAsync();
     }

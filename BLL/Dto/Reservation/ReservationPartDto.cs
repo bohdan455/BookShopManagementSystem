@@ -11,7 +11,5 @@ namespace BLL.Dto.Reservation
         public int BookId { get; set; }
 
         public int Quantity { get; set; }
-
-        public decimal PriceForItem { get; set; }
     }
 }

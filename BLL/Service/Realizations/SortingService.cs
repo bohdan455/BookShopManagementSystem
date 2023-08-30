@@ -1,4 +1,5 @@
 ﻿using BLL.Dto.Book;
+using BLL.Service.Interfaces;
 using DataAccess.Entities;
 using DataAccess.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 namespace BLL.Service.Realizations
 {
     // TODO change this 
-    public class SortingService
+    public class SortingService : ISortingService
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -23,7 +24,7 @@ namespace BLL.Service.Realizations
         public async Task<IEnumerable<Author?>> SortAuthorsByPopularity(string userId)
         {
             //TODO Check if this causes null error
-            var result = await _unitOfWork.Author.GetAllAsync(a => a.UserId == userId,ar => ar.Include(a => a.Books).ThenInclude(b => b.OrderParts));
+            var result = await _unitOfWork.Author.GetAllAsync(a => a.UserId == userId, ar => ar.Include(a => a.Books).ThenInclude(b => b.OrderParts));
             return result.OrderByDescending(a => a?.Books.Sum(b => b.OrderParts.Sum(op => op.Quantity)));
         }
 
@@ -36,7 +37,7 @@ namespace BLL.Service.Realizations
 
         public async Task<IEnumerable<BookBriefInformation?>> SortBooksByPopularity(string userId)
         {
-            var result = await _unitOfWork.Book.GetAllAsync(b => b.UserId == userId, 
+            var result = await _unitOfWork.Book.GetAllAsync(b => b.UserId == userId,
                 br => br.Include(b => b.OrderParts).Include(b => b.Author).Include(b => b.Genre));
 
             return result.OrderBy(b => b.OrderParts.Sum(od => od.Quantity)).Select(b => new BookBriefInformation
