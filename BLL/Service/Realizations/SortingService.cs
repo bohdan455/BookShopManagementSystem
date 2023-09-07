@@ -40,7 +40,7 @@ namespace BLL.Service.Realizations
             var result = await _unitOfWork.Book.GetAllAsync(b => b.UserId == userId,
                 br => br.Include(b => b.OrderParts).Include(b => b.Author).Include(b => b.Genre));
 
-            return result.OrderBy(b => b.OrderParts.Sum(od => od.Quantity)).Select(b => new BookBriefInformation
+            return result.OrderByDescending(b => b.OrderParts.Sum(od => od.Quantity)).Select(b => new BookBriefInformation
             {
                 Author = b.Author.Name,
                 Genre = b.Genre.Name,

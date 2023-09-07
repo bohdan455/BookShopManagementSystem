@@ -12,12 +12,15 @@ namespace Mvc.Controllers
     {
         private readonly ILogger<BookController> _logger;
         private readonly IBookService _bookService;
+        private readonly ISortingService _sortingService;
 
         public BookController(ILogger<BookController> logger,
-            IBookService bookService)
+            IBookService bookService,
+            ISortingService sortingService)
         {
             _logger = logger;
             _bookService = bookService;
+            _sortingService = sortingService;
         }
 
         public async Task<IActionResult> ListOfBooks(string searchValue)
@@ -71,6 +74,14 @@ namespace Mvc.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             var book = await _bookService.GetFullInformation(id,userId);
             return View(book);
+        }
+
+        public async Task<IActionResult> BestBooks()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            var bestBooks = await _sortingService.SortBooksByPopularity(userId);
+
+            return View(bestBooks);
         }
     }
 }
