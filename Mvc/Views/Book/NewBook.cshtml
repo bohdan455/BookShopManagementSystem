@@ -31,7 +31,7 @@
         <input type="text" class="form-control" name="sellingPrice" placeholder="Enter selling price">
     </div>
     <select class="form-select" aria-label="previous book of this series" name="previousBookId">
-        <option selected value="null">Previous book of this series</option>
+        <option selected value="">Previous book of this series</option>
         @foreach (var book in Model)
         {
             <option value="@book.Id">@book.Title</option>

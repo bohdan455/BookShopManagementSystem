@@ -38,12 +38,14 @@ namespace Mvc.Controllers
         [HttpPost]
         public async Task<IActionResult> NewBook(NewBookModel newBookModel)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            var books = await _bookService.Search(userId);
+
             if (!ModelState.IsValid)
             {
                 ViewData["Added Info"] = "";
-                return View();
+                return View(books);
             }
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
             await _bookService.Add(new BLL.Dto.Book.BookDto
             {
@@ -61,7 +63,6 @@ namespace Mvc.Controllers
             });
 
             ViewData["Added Info"] =  $"{newBookModel.Title} was added";
-            var books = await _bookService.Search(userId);
             return View(books);
         }
 
